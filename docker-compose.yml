@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  nginx:
+    depends_on:
+        - backend
+        - frontend
+    restart: always
+    image: 4lexdel/elective-web-project:nginx
+    ports:
+      - "80:80"
+    networks:
+      - api_network
+      - front_network
+  frontend:
+    image: 4lexdel/elective-web-project:frontend
+    ports:
+      - "4200:4200"
+    networks:
+      - front_network
+  backend:
+    image: 4lexdel/elective-web-project:backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    environment:
+      MONGODB_URI: mongodb://database:27017/mydatabase
+    networks:
+      - front_network
+      - api_network
+  database:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - api_network
+networks:
+  front_network:
+  api_network:
+
+volumes:
+  mongodb_data:
+    driver: local
